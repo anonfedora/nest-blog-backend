@@ -65,4 +65,58 @@ export class BlogController {
             route: BLOG_ENTRIES_URL
         });
     }
+
+    @Get("user/:user")
+    indexByUser(
+        @Query("page") page: number = 1,
+        @Query("limit") limit: number = 10,
+        @Param("user") userId: number
+    ) {
+        limit = limit > 100 ? 100 : limit;
+
+        return this.blogService.paginateByUser(
+            {
+                limit: Number(limit),
+                page: Number(page),
+                route: BLOG_ENTRIES_URL + "/user/" + userId
+            },
+            Number(userId)
+        );
+    }
+
+    @Get(":id")
+    findOne(@Param("id") id: number): Observable<BlogEntry> {
+        return this.blogService.findOne(id);
+    }
+
+    @UseGuards(JwtAuthGuard, UserIsAuthorGuard)
+    @Put(":id")
+    updateOne(
+        @Param("id") id: number,
+        @Body() blogEntry: BlogEntry
+    ): Observable<BlogEntry> {
+        return this.blogService.updateOne(Number(id), blogEntry);
+    }
+
+    @UseGuards(JwtAuthGuard, UserIsAuthorGuard)
+    @Delete(":id")
+    deleteOne(@Param("id") id: number): Observable<any> {
+        return this.blogService.deleteOne(id);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post("image/upload")
+    @UseInterceptors(FileInterceptor("file", storage))
+    uploadFile(@UploadedFile() file, @Request() req): Observable<Image> {
+        return of(file);
+    }
+
+    @Get("image/:imagename")
+    findImage(@Param("imagename") imagename, @Res() res): Observable<Object> {
+        returnnof(
+            res.sendFile(
+                join(process.cwd(), "uploads/blog-entry-images/" + imagename)
+            )
+        );
+    }
 }
