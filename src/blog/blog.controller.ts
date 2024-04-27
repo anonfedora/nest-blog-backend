@@ -113,7 +113,8 @@ export class BlogController {
 
     @Get("image/:imagename")
     findImage(@Param("imagename") imagename, @Res() res): Observable<Object> {
-        returnnof(
+        return nof(
+        return nof(
             res.sendFile(
                 join(process.cwd(), "uploads/blog-entry-images/" + imagename)
             )
